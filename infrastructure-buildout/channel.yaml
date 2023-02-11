@@ -2,7 +2,7 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: Channel
 metadata:
-  name: gitops
+  name: acm-gitops-pub
   namespace: acm-infrastructure-buildout
   annotations:
     apps.open-cluster-management.io/reconcile-rate: med

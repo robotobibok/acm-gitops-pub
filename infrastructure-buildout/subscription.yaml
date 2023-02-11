@@ -11,7 +11,7 @@ metadata:
   name: infrastructure-buildout
   namespace: acm-clusters-configs
 spec:
-  channel: acm-infrastructure-buildout/gitops
+  channel: acm-infrastructure-buildout/acm-gitops-pub
   placement:
     #local: true
     placementRef:
