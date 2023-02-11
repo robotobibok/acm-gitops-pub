@@ -5,9 +5,10 @@ metadata:
   namespace: openshift-gitops
 spec:
   generators:
-    - clusterDecisionResource:
-        configMapRef: acm-placement
-        name: local-cluster
+    - clusters: {} # Automatically use all clusters defined within Argo CD
+    #- clusterDecisionResource:
+    #    configMapRef: acm-placement
+    #    name: local-cluster
         #requeueAfterSeconds: 30
         #labelSelector:
         #  matchLabels:              # OPTIONAL
