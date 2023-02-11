@@ -3,8 +3,8 @@ kind: Kustomization
 
 resources:
 - namespace.yaml
+- openshift-gitops.yaml
 #- etcd-encryption.yaml
-#- openshift-gitops.yaml
 #- k8s-argocd.yaml
 #- redhat-acs-ocp.yaml
 #- redhat-acs-k8s.yaml
