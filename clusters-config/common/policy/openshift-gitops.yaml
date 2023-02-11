@@ -18,7 +18,7 @@ spec:
           name: openshift-gitops-installed
         spec:
           remediationAction: enforce
-          severity: med
+          severity: medium
           namespaceSelector:
             exclude:
               - kube-*
@@ -41,7 +41,6 @@ spec:
                   name: openshift-gitops-operator
                   source: redhat-operators
                   sourceNamespace: openshift-marketplace
-                  startingCSV: openshift-gitops-operator.v1.3.1
 ---
 apiVersion: policy.open-cluster-management.io/v1
 kind: PlacementBinding
