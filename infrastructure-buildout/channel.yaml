@@ -1,0 +1,11 @@
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Channel
+metadata:
+  name: gitops
+  namespace: acm-infrastructure-buildout
+  annotations:
+    apps.open-cluster-management.io/reconcile-rate: med
+spec:
+  pathname: https://github.com/robotobibok/acm-gitops-pub.git
+  type: Git

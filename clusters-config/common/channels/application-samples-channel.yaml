@@ -1,0 +1,22 @@
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Channel
+metadata:
+  name: gitops
+  namespace: acm-application-samples
+  annotations:
+    apps.open-cluster-management.io/reconcile-rate: med
+spec:
+  type: GitHub
+  pathname: https://github.com/robotobibok/application-samples.git
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Channel
+metadata:
+  name: acm-gitops-pub
+  namespace: acm-infrastructure-buildout
+  annotations:
+    apps.open-cluster-management.io/reconcile-rate: low
+spec:
+  pathname: https://github.com/robotobibok/acm-gitops-pub.git
+  type: Git

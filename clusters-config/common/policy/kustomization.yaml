@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- namespace.yaml
+#- etcd-encryption.yaml
+#- openshift-gitops.yaml
+#- k8s-argocd.yaml
+#- redhat-acs-ocp.yaml
+#- redhat-acs-k8s.yaml
+#- imagemanifestvulnerability.yaml
+#- complianceoperator.yaml
+- placement-all.yaml
+- placement-no-snc.yaml
+- placement-no-ocp.yaml
+- placement-ocp.yaml
+- placement-hub.yaml

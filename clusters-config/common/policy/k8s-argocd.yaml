@@ -1,0 +1,90 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: k8s-argocd-installed
+  namespace: acm-policy
+  annotations:
+    policy.open-cluster-management.io/standards: NIST-CSF
+    policy.open-cluster-management.io/categories: PR.DS Data Security
+    policy.open-cluster-management.io/controls: PR.DS-1 Data-at-rest
+spec:
+  remediationAction: enforce
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: k8s-argocd-operator-installed
+        spec:
+          remediationAction: enforce
+          severity: med
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - default
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                # This is an auto-generated file. DO NOT EDIT
+                apiVersion: operators.coreos.com/v1alpha1
+                kind: Subscription
+                metadata:
+                  name: k8s-argocd-operator
+                  namespace: openshift-operators
+                  labels:
+                    operators.coreos.com/openshift-gitops-operator.openshift-operators: ''
+                spec:
+                  channel: alpha
+                  installPlanApproval: Automatic
+                  name: argocd-operator
+                  source: operatorhubio-catalog
+                  sourceNamespace: openshift-marketplace
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: k8s-argocd-installed
+        spec:
+          namespaceSelector:
+            exclude:
+              - kube-*
+            include:
+              - default
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: argocd
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: argoproj.io/v1alpha1
+                kind: ArgoCD
+                metadata:
+                  name: argocd
+                  namespace: argocd
+                spec:
+                  server:
+                    ingress:
+                      enabled: true
+                    route:
+                      enabled: false
+                    service:
+                      type: LoadBalancer
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-k8s-argo-development
+  namespace: acm-policy
+placementRef:
+  name: non-openshift
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+  - name: k8s-argocd-installed
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io

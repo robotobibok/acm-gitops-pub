@@ -1,0 +1,99 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: redhat-acs-k8s-installed
+  namespace: acm-policy
+  annotations:
+    policy.open-cluster-management.io/standards: NIST-CSF
+    policy.open-cluster-management.io/categories: PR.DS Data Security
+    policy.open-cluster-management.io/controls: PR.DS-1 Data-at-rest
+spec:
+  remediationAction: enforce
+  disabled: false
+  policy-templates:
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: redhat-acs-secrets
+        spec:
+          remediationAction: enforce
+          severity: high
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: stackrox
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Secret
+                metadata:
+                  name: helm-effective-cluster-name
+                  namespace: stackrox
+                  labels:
+                    auto-upgrade.stackrox.io/component: sensor
+                  annotations:
+                    "helm.sh/hook": "pre-install,pre-upgrade"
+                    "helm.sh/resource-policy": "keep"
+                stringData:
+                  cluster-name: |
+                    {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Secret
+                metadata:
+                  name: helm-cluster-config
+                  namespace: stackrox
+                  labels:
+                    auto-upgrade.stackrox.io/component: sensor
+                  annotations:
+                    "helm.sh/hook": "pre-install,pre-upgrade"
+                    "helm.sh/resource-policy": "keep"
+                stringData:
+                  config.yaml: |
+                    clusterName: {{ fromSecret "open-cluster-management-agent" "hub-kubeconfig-secret" "cluster-name" | base64dec }}
+                    notHelmManaged: false
+                    clusterConfig:
+                      staticConfig:
+                        type: KUBERNETES_CLUSTER
+                        mainImage: registry.redhat.io/rh-acs/main@sha256:dc13e3ff268e45309dc6c674396094a3d8777111a612c0cb143049e44c6241f9
+                        collectorImage: registry.redhat.io/rh-acs/collector@sha256:e5a9524efaf7adfb79341048ef2c4fa567e5efd64d208c15e5b26de1fd97e351
+                        centralApiEndpoint: {{ fromSecret "stackrox" "sensor-tls" "acs-host" | base64dec }}
+                        collectionMethod: KERNEL_MODULE
+                        admissionController: false
+                        admissionControllerUpdates: false
+                        admissionControllerEvents: true
+                        tolerationsConfig:
+                          disabled: false
+                        slimCollector: true
+                      dynamicConfig:
+                        disableAuditLogs: true
+                        admissionControllerConfig:
+                          enabled: false
+                          timeoutSeconds: 3
+                          scanInline: false
+                          disableBypass: false
+                          enforceOnUpdates: false
+                        registryOverride:
+                      configFingerprint: {{ fromConfigMap  "stackrox" "helm-cluster-config" "configFingerprint" }}
+                      clusterLabels:
+                        null
+
+---
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-acs-k8s-clusters
+  namespace: acm-policy
+placementRef:
+  name: non-openshift
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+  - name: redhat-acs-k8s-installed
+    kind: Policy
+    apiGroup: policy.open-cluster-management.io

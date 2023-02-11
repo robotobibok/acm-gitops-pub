@@ -1,0 +1,10 @@
+---
+apiVersion: v1                    
+kind: Namespace
+metadata:
+  name: acm-infrastructure-buildout
+---
+apiVersion: v1                    
+kind: Namespace
+metadata:
+  name: acm-clusters-configs
